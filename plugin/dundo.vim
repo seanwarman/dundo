@@ -1,35 +1,35 @@
 " ------------------------------------------------------------------------------------------  DUNDO  ---------------------------------------------------------------------------------------------------
 
 function! DundoDiff()
-  let g:dundobufname = 'dundo-diff'
+  let s:dundobufname = 'dundo-diff'
 
   " Set up the buffer (this makes it hidden)
-  let g:dundobuf = bufnr(g:dundobufname, 1)
-  call setbufvar(g:dundobuf, "&buftype", "nofile")
+  let s:dundobuf = bufnr(s:dundobufname, 1)
+  call setbufvar(s:dundobuf, "&buftype", "nofile")
 
-  let g:undofile = undofile(expand("%"))
+  let s:undofile = undofile(expand("%"))
 
   " TODO: mention in help that Dundo doesn't support more than one
   " undodir value. It'll always look in the first one.
-  if !filereadable(g:undofile)
+  if !filereadable(s:undofile)
     echo 'No undo file found for ' . expand("%")
     return
   endif
 
-  let g:filecontent = systemlist("cat " . expand("%"))
+  let s:filecontent = systemlist("cat " . expand("%"))
 
   " setbufline only works on loaded buffers
-  call bufload(g:dundobufname)
+  call bufload(s:dundobufname)
   let lnum = 0
-  for line in g:filecontent
+  for line in s:filecontent
     let lnum = lnum + 1
-    call setbufline(g:dundobuf, lnum, line)
+    call setbufline(s:dundobuf, lnum, line)
   endfor
 
-  au! BufLeave dundo-diff execute "diffoff! | " . g:dundobuf . " bwipeout"
+  au! BufLeave dundo-diff execute "diffoff! | " . s:dundobuf . " bwipeout"
 
-  execute "vert diffsplit " . g:dundobufname
-  silent execute 'rundo ' . fnameescape(g:undofile)
+  execute "vert diffsplit " . s:dundobufname
+  silent execute 'rundo ' . fnameescape(s:undofile)
   norm zR
 
   map <buffer> > :diffput<cr>
@@ -38,5 +38,4 @@ endfunc
 
 " Dundo!
 noremap <leader>dv :call DundoDiff()<cr>
-command Dundo call DundoDiff()
-
+command! Dundo call DundoDiff()
